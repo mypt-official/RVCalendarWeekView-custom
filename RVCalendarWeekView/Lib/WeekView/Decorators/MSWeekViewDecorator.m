@@ -19,7 +19,7 @@
 +(__kindof MSWeekView*)makeWith:(MSWeekView*)weekView{
     MSWeekViewDecorator* weekViewDecorator  = [self.class new];
     weekViewDecorator.weekView              = weekView;
-    weekViewDecorator.minutesPrecision      = 5;
+    weekViewDecorator.minutesPrecision      = 10;
     weekView.collectionView.dataSource      = weekViewDecorator;
     weekView.collectionView.delegate        = weekViewDecorator;
     weekView.weekFlowLayout.delegate        = weekViewDecorator;
@@ -32,7 +32,7 @@
 }
 
 -(MSWeekView*)baseWeekView{
-   if ([self.weekView isKindOfClass:MSWeekViewDecorator.class])
+   if( [self.weekView isKindOfClass:MSWeekViewDecorator.class])
     return [(MSWeekViewDecorator*)self.weekView baseWeekView];
    else
     return self.weekView;
@@ -47,21 +47,6 @@
 
 -(MSCollectionViewCalendarLayout*)weekFlowLayout{
     return self.baseWeekView.weekFlowLayout;
-}
-
--(MSEventCell *)cellForEvent:(MSEvent*)event{
-    //This does add more cells.. :(
-    int sections = [self.weekView numberOfSectionsInCollectionView:self.collectionView];
-    for (int i = 0; i < sections; i++) {
-        int rows = [self.weekView collectionView:self.collectionView numberOfItemsInSection:i];
-        for (int j = 0; j < rows; j++) {
-            MSEventCell * cell = [self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:j inSection:i]];
-            if (cell.event == event) {
-                return cell;
-            }
-        }
-    }
-    return nil;
 }
 
 //=========================================================
@@ -119,8 +104,18 @@
 //=========================================================
 -(NSDate*)dateForPoint:(CGPoint)point{
     NSDate* firstDay = [self.baseWeekView firstDay];
+    if ([self.baseWeekView.weekFlowLayout sectionWidth] < 100) {
+        firstDay = [firstDay addHours:9];
+    }
+
     NSDate* date = [firstDay addDays    :[self getDayIndexForX:point.x] ];
-    date         = [date withHour       :[self getHourForY    :point.y] timezone:@"device"];
+    
+    if ([self.baseWeekView.weekFlowLayout sectionWidth] > 100) {
+        date = [self.baseWeekView getDateOfCurrentOffset];
+        date = [date addHours:9];
+    }
+    
+    date         = [date withHour       :[self getHourForY    :point.y] timezone:@"UTC"];
     date         = [date withMinute     :[self getMinuteForY  :point.y] ];
     return date;
 }
@@ -141,12 +136,13 @@
 }
 
 -(int)getDayIndexForX:(float)x{
-    x = [self viewXToContentX:x];
-    return x / (self.weekFlowLayout.sectionMargin.left + self.weekFlowLayout.sectionWidth + self.weekFlowLayout.sectionMargin.right);
+//    x = [self viewXToContentX:x];
+    float result = x / (self.weekFlowLayout.sectionMargin.left + self.weekFlowLayout.sectionWidth + self.weekFlowLayout.sectionMargin.right);
+    return result;
 }
 
 -(float)viewXToContentX:(float)x{
-    return x - self.weekFlowLayout.timeRowHeaderWidth + self.collectionView.contentOffset.x - self.weekFlowLayout.contentMargin.left;
+    return x - self.weekFlowLayout.sectionWidth + self.collectionView.contentOffset.x - self.weekFlowLayout.contentMargin.left;
 }
 
 -(float)viewYToContentY:(float)y{

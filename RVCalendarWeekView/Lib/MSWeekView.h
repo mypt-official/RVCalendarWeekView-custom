@@ -22,20 +22,25 @@
 -(NSArray*)weekView:(id)sender unavailableHoursPeriods:(NSDate*)date;
 @end
 
-@interface MSWeekView : UIView <UICollectionViewDataSource, UICollectionViewDelegate,MSCollectionViewDelegateCalendarLayout>
+@interface MSWeekView : UIView <UICollectionViewDataSource, UICollectionViewDelegate,MSCollectionViewDelegateCalendarLayout, UIGestureRecognizerDelegate>
 {
     NSArray             * mEvents;
+    NSDate              * selectedDate;
+    NSDate              * startDate;
 }
 
 @property(strong,nonatomic) UICollectionView* collectionView;
 @property(strong,nonatomic) MSCollectionViewCalendarLayout* weekFlowLayout;
 
+//@property(nonatomic) NSDate *selectedDate;
 @property(nonatomic) int daysToShowOnScreen;
 @property(nonatomic) int daysToShow;
 @property(strong,nonatomic) NSArray* events;
-
+@property (nonatomic) CGFloat lastContentOffset;
+@property(assign, nonatomic) BOOL scrollLeft;
 @property(weak,nonatomic) id<MSWeekViewDelegate> delegate;
 
+@property(assign, nonatomic) BOOL isFirst;
 
 /** Base property for storing each even on its sections, by default the key is the day
   but you can customize to put anything there*/
@@ -60,6 +65,9 @@
 @property(nonatomic) Class unavailableHourClass;
 @property(nonatomic) Class weekendBackgroundClass;
 
+
+-(void)updateSelectedDate:(NSDate *)date;
+-(void)updateStartdate:(NSDate *)date;
 /**
  * Override this function to customize the views you want to use
  * Just change the classes that you will use
@@ -74,6 +82,8 @@
 -(void)addEvent   :(MSEvent*)event;
 -(void)addEvents  :(NSArray*)events;
 -(void)removeEvent:(MSEvent*)event;
+
+-(NSDate *)getDateOfCurrentOffset;
 
 -(NSDate*)firstDay;
 

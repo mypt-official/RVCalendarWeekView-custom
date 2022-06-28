@@ -82,6 +82,8 @@ typedef NS_ENUM(NSUInteger, MSHourGridDivision) {
 @property (nonatomic) MSHeaderLayoutType headerLayoutType;
 @property (nonatomic) BOOL displayHeaderBackgroundAtOrigin;
 
+@property (assign, nonatomic) NSInteger myEarliesHour;
+@property (assign, nonatomic) NSInteger myLatestHour;
 
 - (NSInteger)earliestHour;
 - (NSInteger)latestHour;

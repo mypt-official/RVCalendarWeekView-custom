@@ -17,8 +17,13 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        self.backgroundColor = [UIColor colorWithHexString:@"f7f7f7"];
-        
+        self.backgroundColor = [UIColor whiteColor];
+        self.underLineView = [UIView new];
+        self.underLineView.frame = CGRectMake(0, 65, self.frame.size.width , 5);
+    //    self.underLineView.center = self.center;
+        self.underLineView.backgroundColor = [UIColor colorWithHexString:@"f8f8f8"];
+        self.underLineView.clipsToBounds = true;
+        [self addSubview:self.underLineView];
         //Until sticky headers without bounce.. we can't to that
         /*self.backgroundColor = UIColor.whiteColor;
         UIView* bottomBorder = [[UIView alloc] initWithFrame:CGRectMake(0, self.frame.size.height-BOTTOM_BORDER_WIDTH, self.frame.size.width, BOTTOM_BORDER_WIDTH)];

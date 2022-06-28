@@ -8,8 +8,9 @@
 
 #import "MSWeekViewDecoratorInfinite.h"
 #import "NSDate+Easy.h"
+#import "Util.h"
 
-#define DAYS_TO_LOAD 30
+#define DAYS_TO_LOAD 7
 @interface MSWeekView()
     -(void)groupEventsByDays;
 @end
@@ -33,18 +34,54 @@
     NSInteger maximumOffset = scrollView.contentSize.width - scrollView.frame.size.width;
     
     // Change 10.0 to adjust the distance from side
-    if (maximumOffset - currentOffset <= 10.0 && !mLoading /*&& mShouldLoadMore*/) {
-        //NSLog(@"Load more if necessary");
-        [self loadNextDays];
-    }
+//    if (maximumOffset - currentOffset <= 10.0 && !mLoading  && [Util sharedInstance].nowLoading == false/*&& mShouldLoadMore*/) {
+////    if (currentOffset == maximumOffset && !mLoading  && [Util sharedInstance].nowLoading == false) {
+//
+//        //NSLog(@"Load more if necessary");
+//        [Util sharedInstance].nowLoading = true;
+//        [self loadNextDays];
+//    } else if (currentOffset == 0 && !mLoading && [Util sharedInstance].nowLoading == false) {
+//        [Util sharedInstance].nowLoading = true;
+//        [self loadPrevDays];
+//    }
+
+
 }
 
--(void)loadNextDays{
+-(void)loadPrevDays{
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"showLoading" object:nil];
+
     mLoading = true;
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         
-        NSDate * startDate  = [self.baseWeekView.firstDay   addDays:self.baseWeekView.daysToShow + 1];
-        NSDate * endDate    = [startDate                    addDays:DAYS_TO_LOAD                 - 1];
+        NSDate * startDate  = [self.baseWeekView.firstDay   addDays:-DAYS_TO_LOAD ];
+        NSDate * endDate    = [startDate                    addDays:DAYS_TO_LOAD];
+        
+        self.baseWeekView.daysToShow += DAYS_TO_LOAD;
+        if(self.infiniteDelegate){
+            if(![self.infiniteDelegate weekView:self.baseWeekView newDaysLoaded:startDate to:endDate]){
+                
+            }
+            
+            [self.baseWeekView forceReload:YES];
+        }
+        else{
+            [self.baseWeekView forceReload:YES];
+        }
+        
+        mLoading = false;
+    });
+
+}
+
+-(void)loadNextDays{
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"showLoading" object:nil];
+
+    mLoading = true;
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        
+        NSDate * startDate  = [self.baseWeekView.firstDay   addDays:DAYS_TO_LOAD];
+        NSDate * endDate    = [startDate                    addDays:DAYS_TO_LOAD            ];
         
         self.baseWeekView.daysToShow += DAYS_TO_LOAD;
         if(self.infiniteDelegate){

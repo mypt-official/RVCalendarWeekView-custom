@@ -16,8 +16,9 @@
 @property (nonatomic, strong) MSEvent *event;
 @property (nonatomic, strong) UILabel *title;
 @property (nonatomic, strong) UILabel *location;
-
-- (void)updateColors;
+@property (nonatomic, strong) UILabel *countLabel;
+//- (void)updateColors;
+- (void)updateColorsWithType:(NSString *)typeString;
 
 - (NSDictionary *)titleAttributesHighlighted:(BOOL)highlighted;
 - (NSDictionary *)subtitleAttributesHighlighted:(BOOL)highlighted;

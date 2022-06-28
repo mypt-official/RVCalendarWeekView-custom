@@ -28,15 +28,16 @@
     self = [super initWithFrame:frame];
     if (self) {
         
-        self.backgroundColor    = [UIColor whiteColor];
+        self.backgroundColor    = [UIColor clearColor];
         self.time               = [UILabel new];
         self.time.font          = [UIFont boldSystemFontOfSize:10.0];
-        self.time.textColor     = [UIColor colorWithHexString:@"fd3935"];
+//        self.time.textColor     = [UIColor colorWithHexString:@"fd3935"];
+        self.time.textColor = [UIColor clearColor];
         [self addSubview:self.time];
         
-        [self.time mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.centerY.equalTo(self.mas_centerY);
-            make.right  .equalTo(self.mas_right).offset(-5.0);
+        [self.time makeConstraints:^(MASConstraintMaker *make) {
+            make.centerY.equalTo(self.centerY);
+            make.right  .equalTo(self.right).offset(-5.0);
         }];
         
         self.minuteTimer = [[NSTimer alloc] initWithFireDate:NSDate.nextMinute interval:60

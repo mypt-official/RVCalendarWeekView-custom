@@ -18,6 +18,7 @@
 
 @property (nonatomic, strong) UIView *borderView;
 @property (nonatomic, strong) UIView *topBorderView;
+@property (assign, nonatomic) BOOL isFake;
 
 @end
 
@@ -30,6 +31,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         
+        self.selected = true;
         self.layer.rasterizationScale = [[UIScreen mainScreen] scale];
         self.layer.shouldRasterize = YES;
         
@@ -39,6 +41,7 @@
         self.layer.shadowOpacity = 0.0;
         
         self.borderView = [UIView new];
+        self.borderView.backgroundColor = [UIColor colorWithHexString:@"e5e5ea"];
         [self.contentView addSubview:self.borderView];
         
         self.topBorderView = [UIView new];
@@ -48,77 +51,100 @@
         self.title = [UILabel new];
         self.title.numberOfLines = 0;
         self.title.backgroundColor = [UIColor clearColor];
+        [self.title setFont:[UIFont fontWithName:@"AppleSDGothicNeo-Medium" size:11]];
         [self.contentView addSubview:self.title];
         
         self.location = [UILabel new];
-        self.location.numberOfLines = 0;
+        self.location.numberOfLines = 1;
         self.location.backgroundColor = [UIColor clearColor];
+        self.location.textAlignment = NSTextAlignmentCenter;
+        [self.location setFont:[UIFont fontWithName:@"AppleSDGothicNeo-Medium" size:11]];
         [self.contentView addSubview:self.location];
         
-        [self updateColors];
+        self.countLabel = [UILabel new];
+        self.countLabel.numberOfLines = 0;
+        self.countLabel.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.6];
+        self.countLabel.textAlignment = NSTextAlignmentCenter;
+        self.countLabel.layer.cornerRadius = 4;
+        self.countLabel.clipsToBounds = true;
+        [self.countLabel setFont:[UIFont fontWithName:@"Bazzi" size:10]];
+        [self.contentView addSubview:self.countLabel];
         
-        CGFloat borderWidth = 2.0;
+        [self updateColorsWithType:_event.location];
+        
+        CGFloat borderWidth = 2.9;
         CGFloat contentMargin = 2.0;
-        UIEdgeInsets contentPadding = UIEdgeInsetsMake(8.0, (borderWidth + 4.0), 1.0, 4.0);
-        
-        [self.borderView mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.height.equalTo(self.mas_height);
-            make.width.equalTo(@(borderWidth));
-            make.left.equalTo(self.mas_left);
-            make.top.equalTo(self.mas_top);
+        UIEdgeInsets contentPadding = UIEdgeInsetsMake(4.0, (borderWidth + 4.0), 1.0, 4.0);
+        CGFloat maxWidth = 46.0;
+//
+        [self.borderView makeConstraints:^(MASConstraintMaker *make) {
+//            make.height.equalTo(self.height);
+            make.height.equalTo(@(self.contentView.frame.size.height));
+//            make.width.equalTo(@(borderWidth));
+            make.width.equalTo(@(1));
+            make.left.equalTo(self.contentView);
+            make.top.equalTo(self.contentView);
+            make.bottom.equalTo(self.contentView);
+//            make.right.equalTo(self.right);
         }];
-        
-        [self.topBorderView mas_makeConstraints:^(MASConstraintMaker *make) {
+//
+        [self.topBorderView makeConstraints:^(MASConstraintMaker *make) {
             make.height.equalTo(@(borderWidth));
-            make.width.equalTo(self.mas_width);
-            make.top.equalTo(self.mas_top);
-            make.left.equalTo(self.mas_left);
-            make.right.equalTo(self.mas_right);
+            make.width.equalTo(@(self.contentView.frame.size.width));
+            make.top.equalTo(self.top);
+            make.left.equalTo(self.left);
+            make.right.equalTo(self.right);
         }];
         
-        [self.title mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.top.equalTo(self.mas_top).offset(contentPadding.top);
-            make.left.equalTo(self.mas_left).offset(contentPadding.left);
-            make.right.equalTo(self.mas_right).offset(-contentPadding.right);
+        [self.title makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(self.topBorderView.bottom).offset(3);
+            make.left.equalTo(self.contentView).offset(3);
+//            make.right.equalTo(self.right).offset(-contentPadding.right);
+            make.width.equalTo(@(self.contentView.frame.size.width - 6));
+//            make.centerX.equalTo(self.centerX);
         }];
         
-        [self.location mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.top.equalTo(self.title.mas_bottom).offset(contentMargin);
-            make.left.equalTo(self.mas_left).offset(contentPadding.left);
-            make.right.equalTo(self.mas_right).offset(-contentPadding.right);
-            make.bottom.lessThanOrEqualTo(self.mas_bottom).offset(-contentPadding.bottom);
-        }];
+        [self.location makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(self.title.bottom).offset(contentMargin);
+            make.left.equalTo(self.contentView).offset(3);
+//            make.right.equalTo(self.right).offset(-contentPadding.right);
+            make.bottom.lessThanOrEqualTo(self.bottom).offset(-contentPadding.bottom);
+            
+            make.width.equalTo(@(self.contentView.frame.size.width - 6));
 
-        [self.contentView mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.top.equalTo(self.mas_top);
-            make.bottom.equalTo(self.mas_bottom);
-            make.left.equalTo(self.mas_left);
-            make.right.equalTo(self.mas_right);
+        }];
+        [self.countLabel makeConstraints:^(MASConstraintMaker *make) {
+//            make.top.lessThanOrEqualTo(self.location.bottom).offset(contentMargin);
+            make.left.equalTo(self.contentView).offset(3);
+//            make.right.equalTo(self.right).offset(-contentPadding.right);
+            make.top.equalTo(self.location.bottom).offset(5);
+            make.height.equalTo(@13);
+            
+            make.width.equalTo(@(self.contentView.frame.size.width - 6));
         }];
     }
     return self;
 }
 
-
 #pragma mark - UICollectionViewCell
 - (void)setSelected:(BOOL)selected
 {
-    if (selected && (self.selected != selected)) {
-        [UIView animateWithDuration:0.1 animations:^{
-            self.transform = CGAffineTransformMakeScale(1.025, 1.025);
-            self.layer.shadowOpacity = 0.2;
-        } completion:^(BOOL finished) {
-            [UIView animateWithDuration:0.1 animations:^{
-                self.transform = CGAffineTransformIdentity;
-            }];
-        }];
-    } else if (selected) {
-        self.layer.shadowOpacity = 0.2;
-    } else {
-        self.layer.shadowOpacity = 0.0;
-    }
+//    if (selected && (self.selected != selected)) {
+//        [UIView animateWithDuration:0.1 animations:^{
+////            self.transform = CGAffineTransformMakeScale(1.025, 1.025);
+////            self.layer.shadowOpacity = 0.2;
+//        } completion:^(BOOL finished) {
+//            [UIView animateWithDuration:0.1 animations:^{
+////                self.transform = CGAffineTransformIdentity;
+//            }];
+//        }];
+//    } else if (selected) {
+////        self.layer.shadowOpacity = 0.2;
+//    } else {
+//        self.layer.shadowOpacity = 0.0;
+//    }
     [super setSelected:selected]; // Must be here for animation to fire
-    [self updateColors];    
+    [self updateColorsWithType:_event.location];
     [self removeIndicators];
 }
 
@@ -127,23 +153,79 @@
 - (void)setEvent:(MSEvent *)event
 {
     _event = event;
-    self.title.attributedText    = [[NSAttributedString alloc] initWithString:_event.title attributes:[self titleAttributesHighlighted:self.selected]];
-    self.location.attributedText = [[NSAttributedString alloc] initWithString:_event.location attributes:[self subtitleAttributesHighlighted:self.selected]];
-    [self updateColors];
-}
-
-
-- (void)updateColors
-{
-    [self performSelectorOnMainThread:@selector(updateColorsSelector) withObject:nil waitUntilDone:true];
-}
     
-- (void)updateColorsSelector
+    if ([event.title isEqualToString:@"temp_event"]) {
+        self.isFake = true;
+    } else {
+        self.isFake = false;
+    }
+    NSArray *arr = [_event.restTime componentsSeparatedByString:@"/"];
+    NSString *resttime = [arr objectAtIndex:0];
+    NSMutableAttributedString *attribute = [[NSMutableAttributedString alloc] initWithString:_event.restTime];
+    [attribute addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithHexString:@"fd7430"] range:NSMakeRange(0, resttime.length)];
+    
+    //etc 이벤트일때 countLabel 숨김
+    if ([event.title isEqualToString:@"etc"]) {
+        self.countLabel.hidden = true;
+    }else {
+        self.countLabel.hidden = false;
+    }
+    if (event.classTime == 10) {
+        self.location.hidden = true;
+        self.countLabel.hidden = true;
+    }else if (event.classTime < 40) {
+        self.location.hidden = false;
+        self.countLabel.hidden = true;
+    }else {
+        self.location.hidden = false;
+        self.countLabel.hidden = false;
+    }
+//    self.title.text = _event.title;
+    self.location.text = _event.location;
+    self.countLabel.attributedText = attribute;
+    [self updateColorsWithType:event.title];
+}
+
+
+- (void)updateColorsWithType:(NSString *)typeString
 {
-    self.contentView.backgroundColor = [self backgroundColorHighlighted:self.selected];
-    self.borderView.backgroundColor = [self borderColor];
-    self.title.textColor = [self textColorHighlighted:self.selected];
-    self.location.textColor = [self textColorHighlighted:self.selected];
+//    self.contentView.backgroundColor = [self backgroundColorHighlighted:self.selected];
+    
+   
+//    else if ([typeString isEqualToString:@"ready"]) {
+//
+//    } else if ([typeString isEqualToString:@"ready"]) {
+//
+//    }
+    
+    if (self.isFake) {
+        self.title.textColor = [UIColor clearColor];
+        self.location.textColor = [UIColor clearColor];
+        self.contentView.backgroundColor = [UIColor clearColor];
+        self.topBorderView.backgroundColor = [UIColor clearColor];
+    } else {
+        self.title.textColor             = [UIColor blackColor];
+        self.location.textColor          = [UIColor blackColor];
+        
+        if ([typeString isEqualToString:@"ready"]) {
+            self.contentView.backgroundColor = [UIColor colorWithHexString:@"fff4f3"];
+            self.topBorderView.backgroundColor  = [UIColor colorWithHexString:@"fe7e79"];
+
+        } else if ([typeString isEqualToString:@"attendance"]) {
+            self.contentView.backgroundColor = [UIColor colorWithHexString:@"dcf7ea"];
+            self.topBorderView.backgroundColor  = [UIColor colorWithHexString:@"56ce91"];
+
+        }  else if ([typeString isEqualToString:@"complete"]) {
+            self.contentView.backgroundColor = [UIColor colorWithHexString:@"fff4e6"];
+            self.topBorderView.backgroundColor  = [UIColor colorWithHexString:@"ffe797"];
+            
+        }  else if ([typeString isEqualToString:@"etc"])  {
+            self.contentView.backgroundColor = [UIColor colorWithHexString:@"ebf9ff"];
+            self.topBorderView.backgroundColor  = [UIColor colorWithHexString:@"76d6ff"];
+            
+        }
+
+    }
 }
 
 -(void)removeIndicators{
@@ -161,7 +243,7 @@
     paragraphStyle.hyphenationFactor = 1.0;
     paragraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
     return @{
-             NSFontAttributeName : [UIFont boldSystemFontOfSize:12.0],
+             NSFontAttributeName : [UIFont boldSystemFontOfSize:11],
              NSForegroundColorAttributeName : [self textColorHighlighted:highlighted],
              NSParagraphStyleAttributeName : paragraphStyle
              };
@@ -174,7 +256,7 @@
     paragraphStyle.hyphenationFactor = 1.0;
     paragraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
     return @{
-             NSFontAttributeName : [UIFont systemFontOfSize:12.0],
+             NSFontAttributeName : [UIFont systemFontOfSize:11],
              NSForegroundColorAttributeName : [self textColorHighlighted:highlighted],
              NSParagraphStyleAttributeName : paragraphStyle
              };
@@ -182,12 +264,13 @@
 
 - (UIColor *)backgroundColorHighlighted:(BOOL)selected
 {
-    return selected ? [UIColor colorWithHexString:@"35b1f1"] : [[UIColor colorWithHexString:@"35b1f1"] colorWithAlphaComponent:0.2];
+    return selected ? [ UIColor redColor] : [UIColor orangeColor];
+    //[UIColor colorWithHexString:@"35b1f1"] : [[UIColor colorWithHexString:@"35b1f1"] colorWithAlphaComponent:0.2];
 }
 
 - (UIColor *)textColorHighlighted:(BOOL)selected
 {
-    return selected ? [UIColor whiteColor] : [UIColor colorWithHexString:@"21729c"];
+    return selected ? [UIColor blackColor] : [UIColor colorWithHexString:@"21729c"];
 }
 
 - (UIColor *)borderColor

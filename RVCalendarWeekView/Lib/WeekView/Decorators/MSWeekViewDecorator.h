@@ -19,8 +19,6 @@
 
 -(MSWeekView*)baseWeekView;
 
-- (MSEventCell *)cellForEvent:(MSEvent *)event;
-
 /**
  * Use this variable to change the minutes precision when
  * dragging or creating new event 

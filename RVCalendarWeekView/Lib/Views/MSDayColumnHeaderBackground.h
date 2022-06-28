@@ -9,5 +9,5 @@
 #import <UIKit/UIKit.h>
 
 @interface MSDayColumnHeaderBackground : UICollectionReusableView
-
+@property(strong,nonatomic) UIView *underLineView;
 @end

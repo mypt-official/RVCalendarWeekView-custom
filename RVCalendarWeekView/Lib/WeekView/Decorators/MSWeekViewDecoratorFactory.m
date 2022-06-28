@@ -7,14 +7,16 @@
 //
 
 #import "MSWeekViewDecoratorFactory.h"
-#import "MSWeekViewDecoratorChangeDurationAndDragable.h"
+
 
 @implementation MSWeekViewDecoratorFactory
 
 +(MSWeekView*)make:(MSWeekView*)baseView features:(NSUInteger)features andDelegate:(id)delegate{
     
     MSWeekView* decoratedView = baseView;
+    
 
+    
     if ( (features & MSInfiniteFeature) != 0 ){ // => true
         decoratedView = [MSWeekViewDecoratorInfinite makeWith:decoratedView andDelegate:delegate];
     }
@@ -38,16 +40,13 @@
     if ( (features & MSChangeDurationFeature) != 0 ){    // => true
         decoratedView = [MSWeekViewDecoratorChangeDuration makeWith:decoratedView andDelegate:delegate];
     }
-
-    if ( (features & MSChangeDurationAndDragableFeature) != 0 ){    // => true
-        decoratedView = [MSWeekViewDecoratorChangeDurationAndDragable makeWith:decoratedView andDelegate:delegate];
-    }
     
     return decoratedView;
 }
 
 +(void)setMinutesPrecisionToAllDecorators:(MSWeekView*)weekViewWithDecorators minutesPrecision:(int)minutesPrecision{
-    if ([weekViewWithDecorators isKindOfClass:MSWeekViewDecorator.class]) {
+    
+    if([weekViewWithDecorators isKindOfClass:MSWeekViewDecorator.class]){
         MSWeekViewDecorator* decorator = (MSWeekViewDecorator*)weekViewWithDecorators;
         decorator.minutesPrecision= minutesPrecision;
         [self.class setMinutesPrecisionToAllDecorators:decorator.weekView minutesPrecision:minutesPrecision];

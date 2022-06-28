@@ -27,6 +27,13 @@
     } else {
         gr = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(onLongPress:)];
     }
+    
+    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTap:)];
+    tapGesture.numberOfTapsRequired = 2;
+    gr = tapGesture;
+
+//    gr = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTap:)];
+
     [gr setCancelsTouchesInView:NO];  //To didSelectCell still works
     [self.collectionView addGestureRecognizer:gr];
 }
@@ -53,9 +60,9 @@
     CGPoint cp          = [gestureRecognizer locationInView:self.baseWeekView];
     NSDate* date        = [self dateForPoint:cp];
     
-    if(date.minute > 15 && date.minute < 45)    date = [date withMinute:30];
-    else if(date.minute > 45)                   date = [[date addHour] withMinute:0];
-    else                                        date = [date withMinute:0];
+    if(date.minute > 10 && date.minute < 50)     date = [date withMinute:0];
+    else if(date.minute >= 50)                   date = [date withMinute:30];
+    else                                         date = [[date substractHour] withMinute:30];
     
     return date;
 }
